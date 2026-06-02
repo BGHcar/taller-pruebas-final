@@ -34,10 +34,10 @@ describe('GET /tasks', () => {
     const response = await request(app).get('/tasks');
 
     // TODO: verifica el status code
-    expect(response.status).toBe(/* ??? */);
+    expect(response.status).toBe(200);
 
     // TODO: verifica que data sea un arreglo vacío
-    expect(response.body.data).toEqual(/* ??? */);
+    expect(response.body.data).toEqual([]);
   });
 
   it('debería retornar las tareas que existen', async () => {
@@ -47,10 +47,10 @@ describe('GET /tasks', () => {
     const response = await request(app).get('/tasks');
 
     // TODO: ¿cuántas tareas debería haber en data?
-    expect(response.body.data).toHaveLength(/* ??? */);
+    expect(response.body.data).toHaveLength(1);
 
     // TODO: ¿cuánto debería ser total?
-    expect(response.body.total).toBe(/* ??? */);
+    expect(response.body.total).toBe(1);
   });
 
 });
@@ -66,18 +66,18 @@ describe('GET /tasks/:id', () => {
     const response = await request(app).get(`/tasks/${tarea.id}`);
 
     // TODO: verifica el status y que data.id coincide con tarea.id
-    expect(response.status).toBe(/* ??? */);
-    expect(response.body.data.id).toBe(/* ??? */);
+    expect(response.status).toBe(200); 
+    expect(response.body.data.id).toBe(tarea.id);
   });
 
   it('debería retornar 404 cuando el id no existe', async () => {
     const response = await request(app).get('/tasks/id-inventado-123');
 
     // TODO: verifica el status 404
-    expect(response.status).toBe(/* ??? */);
+    expect(response.status).toBe(404);
 
     // TODO: verifica que el body tenga un campo message
-    expect(response.body).toHaveProperty(/* ??? */);
+    expect(response.body).toHaveProperty('message');
   });
 
 });
@@ -97,13 +97,13 @@ describe('POST /tasks', () => {
       .send(datosTarea);
 
     // TODO: verifica el status 201
-    expect(response.status).toBe(/* ??? */);
+    expect(response.status).toBe(201);
 
     // TODO: verifica que data.title sea igual al que enviamos
-    expect(response.body.data.title).toBe(/* ??? */);
+    expect(response.body.data.title).toBe('Aprender Supertest');
 
     // TODO: verifica que data.status sea 'pending' (valor por defecto)
-    expect(response.body.data.status).toBe(/* ??? */);
+    expect(response.body.data.status).toBe('pending');
   });
 
   it('debería retornar 400 cuando se envía sin título', async () => {
@@ -117,6 +117,12 @@ describe('POST /tasks', () => {
   it('debería retornar 400 cuando el título tiene menos de 3 caracteres', async () => {
     // TODO: escribe la prueba completa
     // Pista: envía { title: 'AB' } y verifica status 400
+      const response = await request(app)
+      .post('/tasks')
+      .send({ title: 'AB', description: 'Título muy corto' });
+      
+    expect(response.status).toBe(400);
+
   });
 
 });
@@ -133,8 +139,8 @@ describe('PATCH /tasks/:id/status', () => {
       .send({ status: 'in_progress' });
 
     // TODO: verifica status 200 y que data.status sea 'in_progress'
-    expect(response.status).toBe(/* ??? */);
-    expect(response.body.data.status).toBe(/* ??? */);
+    expect(response.status).toBe(200);
+    expect(response.body.data.status).toBe('in_progress');
   });
 
   it('debería retornar 400 cuando el estado enviado no es válido', async () => {
@@ -145,6 +151,8 @@ describe('PATCH /tasks/:id/status', () => {
       .send({ status: 'en_el_aire' });
 
     // TODO: escribe los expects
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('message');
   });
 
   it('debería retornar 404 cuando la tarea no existe', async () => {
@@ -153,6 +161,8 @@ describe('PATCH /tasks/:id/status', () => {
       .send({ status: 'done' });
 
     // TODO: escribe los expects
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty('message');
   });
 
 });
@@ -167,12 +177,16 @@ describe('DELETE /tasks/:id', () => {
     const response = await request(app).delete(`/tasks/${tarea.id}`);
 
     // TODO: verifica status 200 y que message existe en el body
-    expect(response.status).toBe(/* ??? */);
-    expect(response.body).toHaveProperty(/* ??? */);
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('message');
   });
 
   it('debería retornar 404 al intentar eliminar una tarea que no existe', async () => {
     // TODO: escribe la prueba completa
+    const response = await request(app).delete('/tasks/id-inventado-123');
+
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty('message');
   });
 
   it('después de eliminar, el GET ya no debería encontrar esa tarea', async () => {
@@ -184,7 +198,7 @@ describe('DELETE /tasks/:id', () => {
     const response = await request(app).get(`/tasks/${tarea.id}`);
 
     // TODO: ¿qué status esperarías ahora?
-    expect(response.status).toBe(/* ??? */);
+    expect(response.status).toBe(404);
   });
 
 });

@@ -55,10 +55,10 @@ describe('TasksService', () => {
 
 
       // Pista 1: ¿cuántas tareas debería traer?
-      expect(resultado).toHaveLength(/* escribe el número esperado */);
+      expect(resultado).toHaveLength(2); //Done
 
       // Pista 2: ¿el repositorio debería haberse llamado una sola vez?
-      expect(TaskRepository.findAll).toHaveBeenCalledTimes(/* escribe el número */);
+      expect(TaskRepository.findAll).toHaveBeenCalledTimes(1); //Done
     });
 
     it('debería retornar un arreglo vacío cuando no hay tareas', () => {
@@ -67,7 +67,7 @@ describe('TasksService', () => {
       const resultado = TasksService.getAllTasks();
 
       // TODO: ¿qué esperarías encontrar en resultado?
-      expect(resultado).toEqual(/* ??? */);
+      expect(resultado).toEqual([]);
     });
 
   });
@@ -83,10 +83,10 @@ describe('TasksService', () => {
       const resultado = TasksService.getTaskById('abc-123');
 
       // TODO: verifica que el resultado sea igual a tareaFalsa
-      expect(resultado).toEqual(/* ??? */);
+      expect(resultado).toEqual(tareaFalsa); //Done
 
       // TODO: verifica que findById fue llamado con el id correcto
-      expect(TaskRepository.findById).toHaveBeenCalledWith(/* ??? */);
+      expect(TaskRepository.findById).toHaveBeenCalledWith('abc-123');
     });
 
     it('debería lanzar un error 404 cuando la tarea no existe', () => {
@@ -97,7 +97,7 @@ describe('TasksService', () => {
       // Pista: usa expect(() => ...).toThrow(...)
       expect(() => {
         TasksService.getTaskById('id-que-no-existe');
-      }).toThrow(/* escribe el mensaje de error que debería lanzar */);
+      }).toThrow('Tarea no encontrada'); //Done
     });
 
   });
@@ -114,20 +114,28 @@ describe('TasksService', () => {
       const resultado = TasksService.createTask(datosNuevaTarea);
 
       // TODO: verifica que el resultado tenga el id esperado
-      expect(resultado.id).toBe(/* ??? */);
+      expect(resultado.id).toBe('xyz-789'); //Done
 
       // TODO: verifica que create fue llamado una vez
-      expect(TaskRepository.create).toHaveBeenCalledTimes(/* ??? */);
+      expect(TaskRepository.create).toHaveBeenCalledTimes(1); //Done
     });
 
     it('debería lanzar un error 400 cuando el título está vacío', () => {
       // TODO: escribe la prueba completa para este caso
       // Pista: llama a TasksService.createTask con un título vacío
+        expect(() => {
+          TasksService.createTask({ title: '', description: 'Descripción de prueba' });
+        }
+      ).toThrow('El título es obligatorio');
       // y verifica que lanza el error correcto
     });
 
     it('debería lanzar un error 400 cuando el título tiene menos de 3 caracteres', () => {
       // TODO: escribe la prueba completa para este caso
+      expect(() => {
+        TasksService.createTask({ title: 'Hi', description: 'Descripción de prueba' });
+      }
+      ).toThrow('El título debe tener al menos 3 caracteres');     
     });
 
   });
@@ -146,7 +154,7 @@ describe('TasksService', () => {
       const resultado = TasksService.updateTaskStatus('abc-123', 'done');
 
       // TODO: ¿qué debería tener resultado.status?
-      expect(resultado.status).toBe(/* ??? */);
+      expect(resultado.status).toBe('done');
     });
 
     it('debería lanzar un error 400 cuando el estado enviado no es válido', () => {
@@ -155,12 +163,19 @@ describe('TasksService', () => {
 
       // TODO: escribe el expect que verifica que se lanza el error
       // con el estado inválido 'volando'
+      expect(() => {
+        TasksService.updateTaskStatus('abc-123', 'volando');
+      }).toThrow('Estado inválido. Los valores permitidos son: pending, in_progress, done');
     });
 
     it('debería lanzar un error 404 cuando la tarea no existe', () => {
       TaskRepository.findById.mockReturnValue(null);
 
       // TODO: escribe el expect completo
+      expect(() => {
+        TasksService.updateTaskStatus('id-que-no-existe', 'done');
+      }
+      ).toThrow('Tarea no encontrada');
     });
 
   });
@@ -177,13 +192,16 @@ describe('TasksService', () => {
       const resultado = TasksService.deleteTask('abc-123');
 
       // TODO: ¿qué valor debería devolver deleteTask cuando elimina bien?
-      expect(resultado).toBe(/* ??? */);
+      expect(resultado).toBe(true);
     });
 
     it('debería lanzar un error 404 cuando se intenta eliminar una tarea que no existe', () => {
       TaskRepository.findById.mockReturnValue(null);
 
       // TODO: escribe la prueba completa
+      expect(() => {
+        TasksService.deleteTask('id-que-no-existe');
+      }).toThrow('Tarea no encontrada');
     });
 
   });
